@@ -70,7 +70,7 @@ Lessons of the Week JS Expert 3.0 Building a multiplatform chat using command li
 🚧🚧🚧
 
 <p size=3>
-  <img src="./assets/jsexpert.jpg">
+  <img src="./assets/tela.jpg">
 </p>
 
 ## 👨🏻‍🚀 About me

@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <p align="center" style="background: #5429cc">
-    <img alt="JSExpertWeek3" src="../../assets/jsexpert.jpg" width="800px" />
+    <img alt="JSExpertWeek3" src="./assets/jsexpert.jpg" width="800px" />
   </p>
 
   <h3 align="center">
@@ -70,7 +70,7 @@ Lessons of the Week JS Expert 3.0 Building a multiplatform chat using command li
 🚧🚧🚧
 
 <p size=3>
-  <img src="../../assets/jsexpert.jpg">
+  <img src="./assets/jsexpert.jpg">
 </p>
 
 ## 👨🏻‍🚀 About me

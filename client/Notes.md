@@ -22,16 +22,16 @@ chmod +x index.js
 
 npm link
 
-hacker-chat --username devontherun --room sala01
+hacker-chat --username gilles30 --room sala01
 
-npm unlink -g @devontherun/ew-hacker-chat-client
+npm unlink -g @Gilles30/hacker-chat
 
 npm login
 
 npm publish --access public
 
-npm i -g @devontherun/ew-hacker-chat-client
+npm i -g @Gilles30/hacker-chat
 
-hacker-chat --username devontherun --room sala01
+hacker-chat --username gilles30 --room sala01
 
 npm unpublish --force

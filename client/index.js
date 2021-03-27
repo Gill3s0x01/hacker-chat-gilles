@@ -2,17 +2,17 @@
 
 /*
 hacker-chat \
- --username devontherun \
+ --username gilles30 \
  --room sala01
 
 ./index.js \
- --username devontherun \
+ --username gilles30 \
  --room sala01
 */
 
 /*
 node index.js \
- --username devontherun \
+ --username gilles30 \
  --room sala01 \
  --hostUri localhost 
 
@@ -36,9 +36,9 @@ const events = eventManager.getEvents();
 socketClient.attachEvents(events);
 
 const data = {
-    roomId: config.room,
-    userName: config.username
-}
+  roomId: config.room,
+  userName: config.username,
+};
 eventManager.joinRoomAndWaitForMessage(data);
 
 const controller = new TerminalController();

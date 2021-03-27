@@ -1,117 +1,107 @@
-import componentsBuilder from "./components.js";
+import ComponentsBuilder from "./components.js";
 import { constants } from "./constants.js";
 
-export default class terminalController {
-  #userCollors = new Map();
+export default class TerminalController {
+    #usersColors = new Map();
 
-  contructor() {}
+    constructor() {}
 
-  #pickCollor() {
-    // Numero ramdomico para gerar varias cores aleatorias
-    return `#` + (((1 << 24) * Math.random()) | 0).toString(16) + `-fg`;
-  }
-  #getUserCollor(userName) {
-    if (this.#userCollors.has(userName)) return this.#userCollors.get(userName);
-    const collor = this.#pickCollor();
-    this.#userCollors.set(userName, collor);
-    return collor;
-  }
+    #pickColor() {
+        return '#' + ((1 << 24) * Math.random() | 0).toString(16) + '-fg';
+    }
 
-  #onInputReceived(eventEmitter) {
-    return function () {
-      const message = this.getValue();
-      console.log(message);
-      this.clearValue();
-    };
-  }
+    #getUserColor(userName) {
+        if (this.#usersColors.has(userName)) return this.#usersColors.get(userName);
 
-  #onMessageReceived({ screen, chat }) {
-    return (msg) => {
-      const { userName, message } = msg;
-      const collor = this.#getUserCollor(userName);
+        const color = this.#pickColor();
+        this.#usersColors.set(userName, color);
 
-      chat.addItem(`{${collor}}{bold}: ${userName}{/}: ${message}`);
-      screen.render();
-    };
-  }
+        return color;
+    }
 
-  #onLogChanged({ screen, activityLog }) {
-    return (msg) => {
-      // sempre left para sair e join para entrar
-      const [userName] = msg.split(/\s/);
-      const collor = this.#getUserCollor(userName);
+    #onInputReceived(eventEmitter) {
+        return function() {
+            const message = this.getValue();
+            eventEmitter.emit(constants.events.app.MESSAGE_SENT, message);
+            this.clearValue();
+        };
+    }
 
-      activityLog.addItem(`{${collor}}{bold}: ${msg.toString()}{/}`);
+    #onMessageReceived({ screen, chat }) {
+        return msg => {
+            const { userName, message } = msg;
+            const color = this.#getUserColor(userName);
 
-      screen.render();
-    };
-  }
+            chat.addItem(`{${color}}{bold}${userName}{/}: ${message}`);
 
-  #onStatusChanged({ screen, status }) {
-    return (users) => {
-      //   pegar o primeiro elemento da lista
-      const { content } = status.items.shift();
-      status.clearItems();
-      status.addItem(content);
+            screen.render();
+        };
+    }
 
-      users.forEach((userName) => {
-        const collor = this.#getUserCollor(userName);
-        status.addItem(`{${collor}}{bold}${userName}{/}`);
-      });
+    #onLogChanged({ screen, activityLog }) {
+        return msg => {
+            const [userName] = msg.split(/\s/);
+            const color = this.#getUserColor(userName);
 
-      screen.render();
-    };
-  }
+            activityLog.addItem(`{${color}}{bold}${msg.toString()}{/}`);
 
-  #registerEvents(eventEmitter, components) {
-    eventEmitter.on(
-      constants.events.app.MESSAGE_RECEIVED,
-      this.#onMessageReceived(components)
-    );
-    eventEmitter.on(
-      constants.events.app.ACTIVITYLOG_UPDATED,
-      this.#onLogChanged(components)
-    );
-    eventEmitter.on(
-      constants.events.app.STATUS_UPDATED,
-      this.#onStatusChanged(components)
-    );
-  }
+            screen.render();
+        };
+    }
 
-  async initializeTable(eventEmitter) {
-    const components = new componentsBuilder()
-      // inicalizou o screen com o titulo na tela
-      .setScreen({
-        title: " HackerChat - Lorison Gilles ",
-      })
-      // seta o layout component
-      .setLayoutComponent()
-      .setInputComponent(this.#onInputReceived(eventEmitter))
-      .setChatComponent()
-      .setActivityLogComponent()
-      .setStatusComponent()
+    #onStatusChanged({ screen, status }) {
+        return users => {
+            const { content } = status.items.shift();
+            status.clearItems();
+            status.addItem(content);
 
-      .build();
+            users.forEach(userName => {
+                const color = this.#getUserColor(userName);
+                status.addItem(`{${color}}{bold}${userName}{/}`);
+            });
 
-    this.#registerEvents(eventEmitter, components);
-    components.input.focus();
-    components.screen.render();
+            screen.render();
+        };
+    }
 
-    // setInterval(() => {
-    //   eventEmitter.emit("message:received", {
-    //     message: "salve quebrada",
-    //     userName: "Gilles",
-    //   });
-    //   eventEmitter.emit("message:received", {
-    //     message: "salve tiozão",
-    //     userName: "Wesley",
-    //   });
-    //   const users = ["Gilles30"];
-    //   eventEmitter.emit(constants.events.app.STATUS_UPDATED, users);
-    //   users.push("Wesley");
-    //   eventEmitter.emit(constants.events.app.STATUS_UPDATED, users);
-    //   users.push("Gusta", "pastor valdomiro");
-    //   eventEmitter.emit(constants.events.app.STATUS_UPDATED, users);
-    // }, 1000);
-  }
+    #registerEvents(eventEmmiter, components) {
+        eventEmmiter.on(constants.events.app.MESSAGE_RECEIVED, this.#onMessageReceived(components));
+        eventEmmiter.on(constants.events.app.ACTIVITYLOG_UPDATED, this.#onLogChanged(components));
+        eventEmmiter.on(constants.events.app.STATUS_UPDATED, this.#onStatusChanged(components));
+    }
+
+    async initializaTable(eventEmmiter) {
+        const components = new ComponentsBuilder()
+            .setCreen({ title: 'HackerChat - DevOnTheRun' })
+            .setLayoutComponent()
+            .setInputComponent(this.#onInputReceived(eventEmmiter))
+            .setChatComponent()
+            .setActivityLogComponent()
+            .setStatusComponent()
+            .build();
+
+        this.#registerEvents(eventEmmiter, components);
+
+        components.input.focus();
+        components.screen.render();
+
+        /*
+        // Tests
+        setInterval(() => {
+            eventEmmiter.emit(constants.events.app.ACTIVITYLOG_UPDATED, 'devOnTheRun join');
+            eventEmmiter.emit(constants.events.app.ACTIVITYLOG_UPDATED, 'johnDoe join');
+            eventEmmiter.emit(constants.events.app.MESSAGE_RECEIVED, { message: 'Hello World!',  userName: 'devOnTheRun'});
+            eventEmmiter.emit(constants.events.app.MESSAGE_RECEIVED, { message: 'Hi!',  userName: 'johnDoe'});
+            eventEmmiter.emit(constants.events.app.ACTIVITYLOG_UPDATED, 'devOnTheRun left');
+            eventEmmiter.emit(constants.events.app.ACTIVITYLOG_UPDATED, 'johnDoe left');
+        }, 1000)
+
+        const users = ['devOnTheRun'];
+        eventEmmiter.emit(constants.events.app.STATUS_UPDATED, users);
+        users.push('johnDoe', 'bobDylan');
+        eventEmmiter.emit(constants.events.app.STATUS_UPDATED, users);
+        users.push('first', 'second');
+        eventEmmiter.emit(constants.events.app.STATUS_UPDATED, users);
+        */
+    }
 }
